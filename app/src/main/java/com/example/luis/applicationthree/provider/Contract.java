@@ -16,6 +16,7 @@ public class Contract {
         // Table columns
         public static final String NAMECONSTRUCTOR = "nameConstructor";
         public static final String YEARBIRDTH = "yearBirdth";
+        public static final String FOUNDER = "founderName";
 
     }
 

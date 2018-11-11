@@ -4,10 +4,12 @@ public class CarConstructor {
 
     String nameConstructor;
     String yearBirdth;
+    String founderName;
 
-    public CarConstructor(String nameConstructor, String yearBirdth) {
+    public CarConstructor(String nameConstructor, String yearBirdth, String founderName) {
         this.nameConstructor = nameConstructor;
         this.yearBirdth = yearBirdth;
+        this.founderName = founderName;
     }
 
     public String getNameConstructor() {
@@ -24,5 +26,13 @@ public class CarConstructor {
 
     public void setYearBirdth(String yearBirdth) {
         this.yearBirdth = yearBirdth;
+    }
+
+    public String getFounderName() {
+        return founderName;
+    }
+
+    public void setFounderName(String founderName) {
+        this.founderName = founderName;
     }
 }
