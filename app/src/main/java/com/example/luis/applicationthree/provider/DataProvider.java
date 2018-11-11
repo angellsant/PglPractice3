@@ -8,6 +8,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.OperationApplicationException;
 import android.content.UriMatcher;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -116,7 +117,7 @@ public class DataProvider extends ContentProvider {
     }
 
 
-    // Scrud de la Uri: insert, delete, update,
+    // Scrud de la Uri: insert, delete, update, query
 
     @Override
     public Uri insert (Uri uri, ContentValues values){
@@ -141,6 +142,41 @@ public class DataProvider extends ContentProvider {
         throw new SQLException("Fallo en la inserción de la fila " + uri);
     }
 
+    @Override
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
+        sqlDB = dbHelper.getWritableDatabase();
+
+        String table = "";
+        switch (sUriMatcher.match(uri)){
+            case CARCONSTRUCTOR_ONE_REG:
+                if (null == selection) selection = "";
+                selection += Contract.Constructor._ID + " = " + uri.getLastPathSegment();
+                table = CONSTRUCTORS_TABLE_NAME;
+                break;
+
+            case CARCONSTRUCTOR_ALL_REGS:
+                table = CONSTRUCTORS_TABLE_NAME;
+                break
+        }
+
+        int rows = sqlDB.delete(table,selection,selectionArgs);
+
+        if (rows>0) {
+            getContext().getContentResolver().notifyChange(uri,null);
+            return rows;
+        }
+        throw new SQLException("Fallo al borrar la fila en " + uri);
+    }
+
+    @Override
+    public Cursor query (Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder){
+
+    }
+
+    @Override
+    public int update (Uri uri, ContentValues values, String selection, String[] selectionArgs){
+
+    }
 
 }
 
