@@ -12,8 +12,10 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.SparseArray;
 
 import java.util.ArrayList;
@@ -171,10 +173,52 @@ public class DataProvider extends ContentProvider {
     @Override
     public Cursor query (Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder){
 
+        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String query = null;
+
+        switch (sUriMatcher.match(uri)){
+            case CARCONSTRUCTOR_ONE_REG:
+                if (null == selection) selection = "";
+                selection += Contract.Constructor._ID + " = " + uri.getLastPathSegment();
+                qb.setTables(CONSTRUCTORS_TABLE_NAME);
+                break
+            case CARCONSTRUCTOR_ALL_REGS:
+                if (TextUtils.isEmpty(sortOrder)) sortOrder = Contract.Constructor._ID + "ASC";
+                qb.setTables(CONSTRUCTORS_TABLE_NAME);
+                break;
+        }
+        Cursor c;
+        c = qb.query(db, projection, selection, selectionArgs, null,null, sortOrder);
+        c.setNotificationUri(getContext().getContentResolver(), uri);
+        return  c;
     }
 
     @Override
     public int update (Uri uri, ContentValues values, String selection, String[] selectionArgs){
+
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        String table = "";
+
+        switch (sUriMatcher.match(uri)){
+            case CARCONSTRUCTOR_ONE_REG:
+                if (null == selection) selection = "";
+                selection += Contract.Constructor._ID + " = " + uri.getLastPathSegment();
+                table = CONSTRUCTORS_TABLE_NAME;
+                break
+            case CARCONSTRUCTOR_ALL_REGS:
+                table = CONSTRUCTORS_TABLE_NAME;
+                break;
+        }
+
+        int rows = sqlDB.update(table,values,selection,selectionArgs);
+        if (rows>0) {
+            getContext().getContentResolver().notifyChange(uri,null);
+            return rows;
+        }
+        throw new SQLException("Fallo al borrar la fila en " + uri);
 
     }
 
